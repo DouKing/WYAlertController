@@ -74,7 +74,9 @@ typedef void(^WYAlertActionHandler)(WYAlertAction *action);
 - (void)showWithCompletion:(void (^)(void))completion {
   __weak typeof(self) weakSelf = self;
   UIViewController *rootVC = [[[UIApplication sharedApplication] keyWindow] rootViewController];
-  rootVC.modalPresentationStyle = UIModalPresentationCurrentContext;
+  if (!_WY_IOS_8_LATER_) {
+    rootVC.modalPresentationStyle = UIModalPresentationCurrentContext;
+  }
   [rootVC presentViewController:self animated:NO completion:^{
     __strong typeof(weakSelf) strongSelf = weakSelf;
     if (_WY_IOS_8_LATER_) {
