@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "WYAlertController"
-  s.version      = "0.0.2"
+  s.version      = "0.0.3"
   s.summary      = "统一`UIAlertView`、`UIActionSheet`、`UIAlertController`"
   s.homepage     = "https://github.com/DouKing/WYAlertController"
   s.license      = "MIT"
