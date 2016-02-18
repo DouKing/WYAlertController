@@ -28,14 +28,18 @@
   WYAlertAction *sureAction = [WYAlertAction actionWithTitle:@"Sure" style:WYAlertActionStyleDefault handler:^(WYAlertAction * _Nonnull action) {
     NSLog(@"Sure");
   }];
-  WYAlertAction *desAction = [WYAlertAction actionWithTitle:@"Destructive" style:WYAlertActionStyleDestructive handler:^(WYAlertAction * _Nonnull action) {
+  WYAlertAction *desAction = [WYAlertAction actionWithTitle:@"Destructive" style:WYAlertActionStyleDefault handler:^(WYAlertAction * _Nonnull action) {
     NSLog(@"Destructive");
   }];
-  WYAlertController *controller = [WYAlertController alertControllerWithTitle:@"Title" message:@"message" preferredStyle:WYAlertControllerStyleActionSheet];
+  WYAlertController *controller = [WYAlertController alertControllerWithTitle:@"Title" message:@"message" preferredStyle:WYAlertControllerStyleAlert];
   [controller addAction:cancelAction];
   [controller addAction:sureAction];
   [controller addAction:desAction];
   [controller showWithCompletion:nil];
+  
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [controller dismissViewControllerAnimated:YES completion:nil];
+  });
 }
 
 @end
