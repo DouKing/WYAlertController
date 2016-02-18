@@ -43,7 +43,9 @@ typedef void(^WYAlertActionHandler)(WYAlertAction *action);
 #pragma mark - WYAlertController -
 
 @interface WYAlertController ()<UIAlertViewDelegate, UIActionSheetDelegate>
-
+@property (nonatomic, weak) UIAlertController *alertController;
+@property (nonatomic, weak) UIAlertView *alertView;
+@property (nonatomic, weak) UIActionSheet *actionSheet;
 @end
 
 @implementation WYAlertController
@@ -63,6 +65,18 @@ typedef void(^WYAlertActionHandler)(WYAlertAction *action);
     }
   }
   return self;
+}
+
+- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
+  if (_WY_IOS_8_LATER_) {
+    [self.alertController dismissViewControllerAnimated:flag completion:nil];
+  } else {
+    [self.alertView dismissWithClickedButtonIndex:0 animated:flag];
+    [self.actionSheet dismissWithClickedButtonIndex:0 animated:flag];
+  }
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [super dismissViewControllerAnimated:NO completion:completion];
+  });
 }
 
 - (void)addAction:(WYAlertAction *)action {
@@ -91,6 +105,7 @@ typedef void(^WYAlertActionHandler)(WYAlertAction *action);
 #pragma mark - Private Methods
 
 - (void)_showAlertControllerCompletion:(void (^)(void))completion {
+  if (self.alertController) { return; }
   UIAlertController *alertController = [UIAlertController alertControllerWithTitle:self.alertTitle
                                                                            message:self.alertMessage
                                                                     preferredStyle:[self _controllerStyleWithStyle:self.preferredStyle]];
@@ -103,21 +118,25 @@ typedef void(^WYAlertActionHandler)(WYAlertAction *action);
     }];
     [alertController addAction:alertAction];
   }
+  self.alertController = alertController;
   [self presentViewController:alertController animated:YES completion:completion];
 }
 
 - (void)_showAlertViewCompletion:(void (^)(void))completion {
   if (WYAlertControllerStyleAlert == self.preferredStyle) {
     //UIAlertView
+    if (self.alertView) { return; }
     UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:self.alertTitle message:self.alertMessage delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
     for (WYAlertAction *action in self.actions) {
       [alertView addButtonWithTitle:action.title];
     }
+    self.alertView = alertView;
     [alertView show];
     return;
   }
   
   //UIActionSheet
+  if (self.actionSheet) { return; }
   //暂存cancel、destrutive
   WYAlertAction *cancelAction = nil;
   WYAlertAction *destructiveAction = nil;
@@ -149,6 +168,7 @@ typedef void(^WYAlertActionHandler)(WYAlertAction *action);
   for (NSInteger i = 1; i < defaultActions.count; ++i) {
     [sheet addButtonWithTitle:defaultActions[i].title];
   }
+  self.actionSheet = sheet;
   [sheet showInView:self.view];
 }
 
