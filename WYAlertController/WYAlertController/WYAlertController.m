@@ -87,7 +87,7 @@ typedef void(^WYAlertActionHandler)(WYAlertAction *action);
 
 - (void)showWithCompletion:(void (^)(void))completion {
   __weak typeof(self) weakSelf = self;
-  UIViewController *rootVC = [[[UIApplication sharedApplication] keyWindow] rootViewController];
+  UIViewController *rootVC = [self _stackTopViewController];
   if (!_WY_IOS_8_LATER_) {
     rootVC.modalPresentationStyle = UIModalPresentationCurrentContext;
   }
@@ -199,6 +199,15 @@ typedef void(^WYAlertActionHandler)(WYAlertAction *action);
     default:
       break;
   }
+}
+
+- (UIViewController *)_stackTopViewController {
+  UIViewController *rootVC = [[[UIApplication sharedApplication] keyWindow] rootViewController];
+  UIViewController *topVC = rootVC;
+  while (topVC.presentedViewController) {
+    topVC = topVC.presentedViewController;
+  }
+  return topVC;
 }
 
 #pragma mark - UIAlertViewDelegate
